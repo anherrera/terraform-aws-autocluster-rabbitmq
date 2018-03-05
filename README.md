@@ -48,8 +48,9 @@ Module usage:
 
     # minimal setup, check Inputs to see the different customisation options
      module "rabbitmq" {
-         source                                = "github.com/grey-systems/terraform-multitier-vpc.git?ref=master"
-         subnet_ids                            = "${var.subnet_ids}"
+         source                                = "github.com/teamleadercrm/terraform-aws-autocluster-rabbitmq.git?ref=master"
+         public_subnet_ids                     = "${var.public_subnet_ids}"
+         private_subnet_ids                    = "${var.private_subnet_ids}"
          availability_zones                    = "${var.availability_zones}"
          aws_keypair_name                      = "${var.aws_keypair_name}"
          environment                           = "${var.environment}"
