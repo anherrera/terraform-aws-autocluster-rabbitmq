@@ -10,7 +10,7 @@ data "aws_ami" "rabbit_ami" {
 }
 
 data "aws_subnet" "subnet_0" {
-  id = "${element(var.subnet_ids,0)}"
+  id = "${element(var.private_subnet_ids,0)}"
 }
 
 data "aws_vpc" "vpc" {
@@ -161,7 +161,7 @@ resource "aws_security_group" "rabbitmq_sg" {
 
 resource "aws_elb" "rabbitmq_elb" {
   name            = "${var.environment}-rabbit"
-  subnets         = ["${var.subnet_ids}"]
+  subnets         = ["${var.public_subnet_ids}"]
   security_groups = ["${aws_security_group.rabbitmq_elb_sg.id}"]
   internal        = "${var.rabbitmq_elb_private}"
 
@@ -250,7 +250,7 @@ resource "aws_autoscaling_group" "rabbit_asg" {
 
   # The chosen availability zones *must* match the AZs the VPC subnets are tied to.
   availability_zones        = ["${var.availability_zones}"]
-  vpc_zone_identifier       = ["${var.subnet_ids}"]
+  vpc_zone_identifier       = ["${var.private_subnet_ids}"]
   launch_configuration      = "${aws_launch_configuration.rabbit_as_conf.id}"
   max_size                  = "${var.rabbitmq_max_nodes}"
   min_size                  = "${var.rabbitmq_min_nodes}"

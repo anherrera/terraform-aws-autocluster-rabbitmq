@@ -1,5 +1,9 @@
 // List of subnets ids to spare the different rabbitmq nodes
-variable "subnet_ids" {
+variable "public_subnet_ids" {
+  type = "list"
+}
+
+variable "private_subnet_ids" {
   type = "list"
 }
 
