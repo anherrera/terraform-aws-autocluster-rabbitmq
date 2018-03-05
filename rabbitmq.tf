@@ -102,6 +102,10 @@ resource "aws_security_group" "rabbitmq_elb_sg" {
     protocol    = "tcp"
     cidr_blocks = ["${concat(split(",",data.aws_vpc.vpc.cidr_block), var.rabbitmq_admin_elb_allow_cidr_blocks)}"]
   }
+
+  tags {
+    Name = "${var.environment}-rabbitmq-elb-sg"
+  }
 }
 
 #security group for instances
@@ -148,6 +152,10 @@ resource "aws_security_group" "rabbitmq_sg" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags {
+    Name = "${var.environment}-rabbitmq-instance-sg"
   }
 }
 
@@ -250,6 +258,12 @@ resource "aws_autoscaling_group" "rabbit_asg" {
   health_check_grace_period = "300"
   health_check_type         = "ELB"
   load_balancers            = ["${aws_elb.rabbitmq_elb.id}"]
+
+  tag {
+    key = "Name"
+    value = "rabbitmq"
+    propagate_at_launch = true
+  }
 }
 
 // Id of the rabbitmq ELB
