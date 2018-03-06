@@ -97,8 +97,8 @@ resource "aws_security_group" "rabbitmq_elb_sg" {
 
   # 80 port is proxied for instance port 15672
   ingress {
-    from_port   = 80
-    to_port     = 80
+    from_port   = 443
+    to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["${concat(split(",",data.aws_vpc.vpc.cidr_block), var.rabbitmq_admin_elb_allow_cidr_blocks)}"]
   }
