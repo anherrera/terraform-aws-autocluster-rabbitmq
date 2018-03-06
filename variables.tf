@@ -82,3 +82,8 @@ variable "rabbitmq_dns_name" {
 variable "route53_zone_id" {
   default = ""
 }
+
+//SSL Certificate ID to place infront of the dashboard
+variable "ssl_certificate_id" {
+  default = ""
+}

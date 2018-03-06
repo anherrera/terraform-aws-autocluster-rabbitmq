@@ -173,10 +173,11 @@ resource "aws_elb" "rabbitmq_elb" {
   }
 
   listener {
-    instance_port     = 15672
-    instance_protocol = "http"
-    lb_port           = 80
-    lb_protocol       = "http"
+    instance_port      = 15672
+    instance_protocol  = "http"
+    lb_port            = 443
+    lb_protocol        = "https"
+    ssl_certificate_id = "${var.ssl_certificate_id}"
   }
 
   listener {
@@ -206,7 +207,7 @@ resource "aws_elb" "rabbitmq_elb" {
 }
 
 # route53_dns record for the elb, only if route53_zone_id is provided
-resource "aws_route53_record" "rabbitma-dns" {
+resource "aws_route53_record" "rabbitmq-dns" {
   count   = "${var.route53_zone_id == "" ? 0 : 1}"
   zone_id = "${var.route53_zone_id}"
   name    = "${var.rabbitmq_dns_name}"
