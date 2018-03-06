@@ -146,6 +146,14 @@ resource "aws_security_group" "rabbitmq_sg" {
     cidr_blocks = ["${concat(split(",",data.aws_vpc.vpc.cidr_block), var.rabbitmq_instance_allowed_cidr_blocks)}"]
   }
 
+  # reqired for cluster configs
+  ingress {
+    from_port   = 25672
+    to_port     = 25672
+    protocol    = "tcp"
+    cidr_blocks = ["${concat(split(",",data.aws_vpc.vpc.cidr_block), var.rabbitmq_instance_allowed_cidr_blocks)}"]
+  }
+
   # all outbound traffic allowed
   egress {
     from_port   = 0
