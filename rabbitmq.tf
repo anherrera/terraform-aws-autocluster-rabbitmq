@@ -17,6 +17,12 @@ data "aws_vpc" "vpc" {
   id = "${data.aws_subnet.subnet_0.vpc_id}"
 }
 
+resource "random_string" "name" {
+  length = 8
+  special = false
+  upper = false
+}
+
 resource "aws_iam_role" "autoscaling_rabbitmq_role" {
   name = "${var.environment}-rabbitm-autoscale"
 
@@ -70,7 +76,7 @@ resource "aws_iam_instance_profile" "rabbitmq_auto_scale_profile" {
 }
 
 resource "aws_security_group" "rabbitmq_elb_sg" {
-  name        = "${var.environment}-rabbitmq-elb-sg"
+  name        = "${var.environment}-rabbitmq-elb-sg-${random_string.name.result}"
   description = "${var.environment} Security group for rabbitmq autoscale elb"
   vpc_id      = "${data.aws_vpc.vpc.id}"
 
@@ -106,11 +112,15 @@ resource "aws_security_group" "rabbitmq_elb_sg" {
   tags {
     Name = "${var.environment}-rabbitmq-elb-sg"
   }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 #security group for instances
 resource "aws_security_group" "rabbitmq_sg" {
-  name        = "${var.environment}-rabbitmq-instance-sg"
+  name        = "${var.environment}-rabbitmq-instance-sg-${random_string.name.result}"
   description = "rabbitmq_sg Security group for instances"
   vpc_id      = "${data.aws_vpc.vpc.id}"
 
@@ -165,10 +175,14 @@ resource "aws_security_group" "rabbitmq_sg" {
   tags {
     Name = "${var.environment}-rabbitmq-instance-sg"
   }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_elb" "rabbitmq_elb" {
-  name            = "${var.environment}-rabbit"
+  name            = "${var.environment}-rabbit-${random_string.name.result}"
   subnets         = ["${var.public_subnet_ids}"]
   security_groups = ["${aws_security_group.rabbitmq_elb_sg.id}"]
   internal        = "${var.rabbitmq_elb_private}"
@@ -208,6 +222,10 @@ resource "aws_elb" "rabbitmq_elb" {
   connection_draining         = true
   connection_draining_timeout = 400
 
+  lifecycle {
+    create_before_destroy = true
+  }
+
   tags {
     Name = "${var.environment}-rabbitmq"
     Env  = "${var.environment}"
@@ -243,19 +261,23 @@ EOF
 }
 
 resource "aws_launch_configuration" "rabbit_as_conf" {
-  name                 = "${var.environment}_rabbitmq"
+  name                 = "${var.environment}_rabbitmq-${random_string.name.result}"
   image_id             = "${data.aws_ami.rabbit_ami.id}"
   instance_type        = "${var.rabbitmq_instance_type}"
   iam_instance_profile = "${aws_iam_instance_profile.rabbitmq_auto_scale_profile.id}"
   key_name             = "${var.aws_keypair_name}"
   security_groups      = ["${aws_security_group.rabbitmq_sg.id}"]
   user_data            = "${data.template_file.rabbitmq_cloud_init.rendered}"
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_autoscaling_group" "rabbit_asg" {
   # We want this to explicitly depend on the launch config above
   depends_on = ["aws_launch_configuration.rabbit_as_conf"]
-  name       = "${var.environment}-rabbit-asg"
+  name       = "${var.environment}-rabbit-asg-${random_string.name.result}"
 
   # The chosen availability zones *must* match the AZs the VPC subnets are tied to.
   availability_zones        = ["${var.availability_zones}"]
@@ -267,6 +289,10 @@ resource "aws_autoscaling_group" "rabbit_asg" {
   health_check_grace_period = "300"
   health_check_type         = "ELB"
   load_balancers            = ["${aws_elb.rabbitmq_elb.id}"]
+
+  lifecycle {
+    create_before_destroy = true
+  }
 
   tag {
     key = "Name"
