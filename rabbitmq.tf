@@ -18,9 +18,9 @@ data "aws_vpc" "vpc" {
 }
 
 resource "random_string" "name" {
-  length = 8
+  length  = 8
   special = false
-  upper = false
+  upper   = false
 }
 
 resource "aws_iam_role" "autoscaling_rabbitmq_role" {
@@ -256,7 +256,7 @@ packages:
   - docker-engine
 runcmd:
   - export AWS_DEFAULT_REGION=`ec2metadata --availability-zone | sed s'/.$//'`
-  - docker run -d --name rabbitmq --net=host -p 4369:4369 -p 5672:5672 -p 15672:15672 -p 25672:25672 -e AUTOCLUSTER_TYPE=aws -e AWS_AUTOSCALING=true -e AUTOCLUSTER_CLEANUP=true -e CLEANUP_WARN_ONLY=false -e AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION gavinmroy/alpine-rabbitmq-autocluster:3.6.2-0.6.0
+  - docker run -d --name rabbitmq --net=host -p 4369:4369 -p 5672:5672 -p 15672:15672 -p 25672:25672 -e AUTOCLUSTER_TYPE=aws -e AWS_AUTOSCALING=true -e AUTOCLUSTER_CLEANUP=true -e CLEANUP_WARN_ONLY=false -e AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION teamleader/alpine-rabbitmq-autocluster:3.6.15-0.10.0
 EOF
 }
 
@@ -295,8 +295,8 @@ resource "aws_autoscaling_group" "rabbit_asg" {
   }
 
   tag {
-    key = "Name"
-    value = "rabbitmq"
+    key                 = "Name"
+    value               = "rabbitmq"
     propagate_at_launch = true
   }
 }
