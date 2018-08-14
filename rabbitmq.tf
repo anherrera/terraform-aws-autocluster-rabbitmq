@@ -263,9 +263,9 @@ output "rabbitmq_elb_zone_id" {
   value = "${aws_elb.rabbitmq_elb.zone_id}"
 }
 
-output "rabbitmq_elb_security_group_id" {
-  value = "${aws_security_group.rabbitmq_elb_sg.id}"
-}
+//output "rabbitmq_elb_security_group_id" {
+//  value = "${aws_security_group.rabbitmq_elb_sg.id}"
+//}
 
 // Id of the autoscaling group
 output "rabbitmq_autoscaling_group_id" {
