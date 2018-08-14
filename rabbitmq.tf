@@ -256,6 +256,16 @@ resource "aws_autoscaling_group" "rabbit_asg" {
 output "rabbitmq_elb_id" {
   value = "${aws_elb.rabbitmq_elb.id}"
 }
+output "rabbitmq_elb_dns_name" {
+  value = "${aws_elb.rabbitmq_elb.dns_name}"
+}
+output "rabbitmq_elb_zone_id" {
+  value = "${aws_elb.rabbitmq_elb.zone_id}"
+}
+
+output "rabbitmq_elb_security_group_id" {
+  value = "${aws_elb.rabbitmq_elb_sg.id}"
+}
 
 // Id of the autoscaling group
 output "rabbitmq_autoscaling_group_id" {
